@@ -1,0 +1,97 @@
+<?php
+/**
+ * This module installs two tables into the system
+ * @return 
+ */
+
+function user_role_moderation_schema() {
+  $schema['user_role_moderation'] = array(
+  'fields' => array(
+    'uid' => array(
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => t('user uid'),
+    ),
+    'locked_by' => array(
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => t('locked by moderator, this should be the moderator\'s uid'),
+    ),
+    'locked_datetime' => array(
+      'type' => 'int',
+      'not null' => FALSE,
+      'description' => t('last locked datetime, use unix timestamp'),
+    ),
+    
+    'status' => array(
+      'type' => 'int',
+      'not null' => TRUE,
+      'default' => 0,
+      'description' => t('status of user, use 1 if locked, 0 if unlocked'),
+    )
+    
+    
+    ),
+    'primary key' => array('uid'),
+  );
+  
+  $schema['user_role_moderation_comment'] = array(
+    'fields' => array(
+      'cid' => array(
+        'type' => 'serial',  
+        'size' => 'medium',            
+        'not null' => TRUE,
+        'description' => t('user role moderation comment cid'),
+      ),
+      'uid' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => t('user uid'),
+      ),
+      'moderator_id' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => t('moderator\'s uid'),
+      ),
+      
+      'datetime' => array(
+        'type' => 'int',
+        'not null' => FALSE,
+        'description' => t('datetime, use unix timestamp'),
+      ),
+      'comment' => array(
+        'type' => 'text',
+    	  'size' => 'medium',
+        'not null' => FALSE,
+        'description' => t('Moderator\'s comment'),
+      	)
+      ),
+    'primary key' => array('cid'),
+  );  
+
+  return $schema;
+}
+
+function user_role_moderation_install() {
+  // Create tables.
+	$success = drupal_install_schema('user_role_moderation');
+	if ($success) {
+	  drupal_set_message(st('User role moderation installed tables successfully.'));
+  }else {
+	  drupal_set_message(st('The installation of User role moderation failed.'), 'error');
+  }
+}
+
+function user_role_moderation_uninstall() {
+	$success = drupal_uninstall_schema('user_role_moderation');
+  if ($success) {
+    drupal_set_message(st('User role moderation uninstalled tables successfully.'));
+  } else {
+    drupal_set_message(st('The uninstallation of user role moderation failed.'), 'error');
+  }
+
+}
+

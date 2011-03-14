@@ -1,0 +1,17 @@
+; $Id$
+name = User role moderation 
+description = This module allows moderators perform first post moderation and assign user to a role.
+
+core = 6.x
+
+dependencies[] = comment
+dependencies[] = taxonomy
+dependencies[] = jquery_update
+dependencies[] = jquery_ui
+dependencies[] = colorbox
+
+
+version = "1.0"
+
+project = "User role moderation"
+package = "Moderation"

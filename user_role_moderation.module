@@ -1,0 +1,87 @@
+<?php
+// $Id$
+
+function user_role_moderation_menu() {
+  $items = array();
+  // This is administration setting URL
+  $items['admin/settings/user-role-moderation'] = array(
+    'title' => 'User role moderation settings',
+    'description' => 'Allow moderators assign role to user after first
+      post comment if is checked.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('user_role_moderation_admin'),
+    'access arguments' => array('Manage user role moderation settings'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'user_role_moderation_admin_settings.inc',
+  );
+  // This is moderators URL
+  $items['admin/moderation/list-users'] = array(
+    'title' => 'Role moderation',
+    'page callback' => 'user_role_moderation_list_users',
+    'access arguments' => array('Approve user role'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'user_role_moderation_list_users.inc',
+  );
+  // Link to approve user
+  $items['admin/moderation/user-role/action/approve'] = array(
+    'title' => 'Approve user',
+    'page callback' => 'user_role_moderation_approve_user',
+    'page arguments' => array(5),
+    'access arguments' => array('Approve user role'),
+    'file' => 'user_role_moderation_ajax_call.inc',
+    'type' => MENU_CALLBACK,
+  );
+  // Link to ban user
+  $items['admin/moderation/user-role/action/ban'] = array(
+    'title' => 'Ban user',
+    'page callback' => 'user_role_moderation_ban_user',
+    'page arguments' => array(5, 6),
+    'access arguments' => array('Approve user role'),
+    'file' => 'user_role_moderation_ajax_call.inc',
+    'type' => MENU_CALLBACK ,
+  );
+  //To check locked session
+  $items['admin/moderation/user-role/action/lock'] = array(
+    'title' => 'Status check',
+    'page callback' => 'user_role_moderation_ajax_lock',
+    'page arguments' => array(5),
+    'access arguments' => array('Approve user role'),
+    'file' => 'user_role_moderation_ajax_call.inc',
+    'type' => MENU_CALLBACK ,
+  );
+  //To check locked session
+  $items['admin/moderation/user-role/action/unlock'] = array(
+    'title' => 'Status check',
+    'page callback' => 'user_role_moderation_ajax_unlock',
+    'page arguments' => array(5),
+    'access arguments' => array('Approve user role'),
+    'file' => 'user_role_moderation_ajax_call.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Permissions for User role moderation
+ */
+function user_role_moderation_perm() {
+  return array('Approve user role', 'View all users only',
+    'Manage user role moderation settings');
+}
+
+/**
+ * Implementation of hook _help
+ * @param object $path
+ * @param object $arg
+ * @return output
+ */
+function forum_moderation_console_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/help#user_role_moderation':
+      $output = '<p>' . t('Refer to README.txt file.') . '</p>';
+      break;
+  }
+  return $output;
+}
