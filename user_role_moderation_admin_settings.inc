@@ -82,7 +82,7 @@ function user_role_moderation_admin() {
  * @return array of roles' name
  */
 function user_role_moderation_get_user_role(){
-  $sql = "SELECT * FROM {role} WHERE rid!='1' AND rid!='2'";
+  $sql = "SELECT * FROM {role} WHERE rid <> 1 AND rid <> 2";
   $result = db_query($sql);
   $name['none']= 'No role';
   while ($roles = db_fetch_object($result)) {
