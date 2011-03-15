@@ -50,7 +50,7 @@ function user_role_moderation_admin() {
       moderator'),
     '#required' => TRUE,
   );
-  $reason = 'SPAM\nAbusive\nNot on topic';
+  $reason = "SPAM\nAbusive\nNot on topic";
   $form['URM_reason'] = array(
     '#type' => 'textarea',
     '#title' => t('Define reasons why user is banned by moderator'),
