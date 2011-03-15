@@ -83,7 +83,7 @@ function user_role_moderation_admin() {
  * 
  * @return array of roles' name
  */
-function user_role_moderation_get_user_role(){
+function user_role_moderation_get_user_role() {
   $result = db_query("SELECT * FROM {role} WHERE rid <> 1 AND rid <> 2");
   $name['none']= t('No role');
   while ($roles = db_fetch_object($result)) {
@@ -96,14 +96,14 @@ function user_role_moderation_get_user_role(){
  * Return available JQuery UI themes from the JQuery UI folder 
  * @return 
  */
-function user_role_moderation_jquery_ui_themes(){
-  $search_dir = drupal_get_path('module', 'jquery_ui').'/jquery.ui/themes';
+function user_role_moderation_jquery_ui_themes() {
+  $search_dir = drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes';
   $exclude = array('.', '..', 'CVS');
   
   $dir = file_scan_directory($search_dir, '.*', $exclude , 0, FALSE);
   
-  if(is_array($dir)){
-    foreach($dir as $key => $val) {
+  if (is_array($dir)) {
+    foreach ($dir as $key => $val) {
       $output[$val->basename] = $val->basename; 
     }
     return $output;
