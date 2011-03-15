@@ -1,5 +1,7 @@
 <?php
-// $Id: user_role_moderation_admin_settings.inc,v 1.11 2010/05/26 05:23:30 shamlin Exp $
+/**
+ *  @file All the admin forms for this module
+ */
 
 function user_role_moderation_admin() {
   $form = array();
@@ -106,7 +108,7 @@ function user_role_moderation_jquery_ui_themes(){
     }
     return $output;
   }
-  else{
+  else {
     return FALSE;
   }
 }
