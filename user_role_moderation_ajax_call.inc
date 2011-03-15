@@ -1,5 +1,4 @@
 <?php
-// $Id: user_role_moderation_ajax_call.inc,v 1.23 2010/05/27 04:39:08 shamlin Exp $
 
 /**
  * This function handles user approval ajax call.
@@ -89,24 +88,16 @@ function user_role_moderation_approve_user($uid) {
  */
 function user_role_moderation_ban_user($uid, $reason_id = '') {
   if (user_role_moderation_ajax_call($uid)) {
-    //Block user
-    $sql = "UPDATE {users} SET status='0' WHERE uid='%d'";
-            
-    $success = db_query($sql, $uid);
-    if ($success) {
+    $success = db_query("UPDATE {users} SET status='0' WHERE uid='%d'", $uid);
+    if ($success && user_role_moderation_insert_comment($uid, $reason_id)) {
       //Insert moderator's selected reason into reason to ban table
-      if (user_role_moderation_insert_comment($uid, $reason_id)) {
-        $out = 'uid=valid&status=ban_successful&reason=' . $reason_id;
-        
-        //_user_mail_notify is drupal core function...
-        $user_obj = user_load($uid);
-        $op = 'status_blocked';
-        _user_mail_notify($op, $user_obj);
-        sess_destroy_uid($uid);
-      }
-      else {
-        $out = 'uid=valid&status=ban_failed';
-      }
+      $out = 'uid=valid&status=ban_successful&reason=' . $reason_id;
+
+      //_user_mail_notify is drupal core function...
+      $user_obj = user_load($uid);
+      $op = 'status_blocked';
+      _user_mail_notify($op, $user_obj);
+      sess_destroy_uid($uid);
     }
     else {
       $out = 'uid=valid&status=ban_failed';
@@ -139,29 +130,19 @@ function user_role_moderation_ajax_call($uid) {
     user_role_moderation_insert_locked_ssesion($uid);
     return TRUE;
   }
-  else {  
-    if ($locked_user['locked_datetime'] +
-      variable_get('URM_lock_expiry_time', '120') > time()) {
-      
-      if ($locked_user['locked_by'] == $user->uid) {
-        //Renew my locked session
-        //echo "renewing_session-".$uid;
-        user_role_moderation_renew_locked_session($uid);
-        return TRUE;  
-      }
-      else {
-        //Return false
-        //echo "session is locked by".$item['locked_by'];
-        return FALSE;
-      }
-    }
-    else {
-      //Return true
-      user_role_moderation_remove_locked_ssesion($uid);
-      user_role_moderation_insert_locked_ssesion($uid);
+    
+  if ($locked_user['locked_datetime'] + variable_get('URM_lock_expiry_time', '120') > time()) {
+    if ($locked_user['locked_by'] == $user->uid) {
+      user_role_moderation_renew_locked_session($uid);
       return TRUE;
     }
+    return FALSE;
   }
+  
+  user_role_moderation_remove_locked_ssesion($uid);
+  user_role_moderation_insert_locked_ssesion($uid);
+  return TRUE;
+  
 }
 
 /**
@@ -342,22 +323,21 @@ function user_role_moderation_user_is_locked($uid) {
     WHERE urm.uid='%d'
     AND urm.uid > 1 ";
     
-   $result = db_query($sql, $uid);
-    //$out=array();
-    while ($row = db_fetch_object($result)) {
-      $out['uid'] = $row->uid;      
-      $out['locked_by'] = $row->locked_by;      
-      $out['locked_datetime'] = $row->locked_datetime;      
-      $out['status'] = $row->status;
-      $out['total']= count($row);      
-    }
+  $result = db_query($sql, $uid);
+  //$out=array();
+  while ($row = db_fetch_object($result)) {
+    $out['uid'] = $row->uid;
+    $out['locked_by'] = $row->locked_by;
+    $out['locked_datetime'] = $row->locked_datetime;
+    $out['status'] = $row->status;
+    $out['total']= count($row);
+  }
 
-    if (count($row) == 1 ) {
-      return $out;  
-    }
-    else {
-      return FALSE;
-    }
+  if (count($row) == 1 ) {
+    return $out;
+  }
+  return FALSE;
+
 }
 
 /**
