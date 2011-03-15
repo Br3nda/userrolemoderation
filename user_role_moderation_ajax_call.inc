@@ -33,7 +33,7 @@ function user_role_moderation_approve_user($uid) {
           $ucm_flag = variable_get('UCM_flag', '');
           if ($ucm_flag) {
             $flag = flag_get_flag($ucm_flag);
-            $s = "SELECT cid FROM {comments} WHERE uid='%d'";
+            $s = "SELECT cid FROM {comments} WHERE uid = %d";
             $r = db_query($s, $uid);
             while ($rs = db_fetch_object($r)) {
               $cid = $rs->cid;
@@ -41,7 +41,7 @@ function user_role_moderation_approve_user($uid) {
               //Publish comment
               $upd = "UPDATE {comments}
                 SET status = '0'
-                WHERE cid = '%d'";
+                WHERE cid = %d";
               db_query($upd, $cid);
 
               watchdog('URM - approve', 
@@ -88,7 +88,7 @@ function user_role_moderation_approve_user($uid) {
  */
 function user_role_moderation_ban_user($uid, $reason_id = '') {
   if (user_role_moderation_ajax_call($uid)) {
-    $success = db_query("UPDATE {users} SET status='0' WHERE uid='%d'", $uid);
+    $success = db_query("UPDATE {users} SET status = 0 WHERE uid = %d", $uid);
     if ($success && user_role_moderation_insert_comment($uid, $reason_id)) {
       //Insert moderator's selected reason into reason to ban table
       $out = 'uid=valid&status=ban_successful&reason=' . $reason_id;
@@ -240,7 +240,7 @@ function user_role_moderation_is_valid_user($uid) {
   // exclude uid 0, 1
   $sql = "SELECT *
     FROM {users} AS u 
-    WHERE u.uid = '%d'
+    WHERE u.uid = %d
     AND u.uid > 1";
   $result = db_query($sql, $uid);
 
@@ -285,7 +285,7 @@ function user_role_moderation_is_unmoderated_user($uid) {
       FROM {users} AS u
       LEFT JOIN {users_roles} AS ur
       ON u.uid = ur.uid 
-      WHERE u.uid = '%d'
+      WHERE u.uid = %d
       AND u.status = 1
       AND u.uid > 1 " . $sql_filter;
     $result = db_query($sql, $uid);
@@ -320,7 +320,7 @@ function user_role_moderation_user_is_locked($uid) {
   $sql = "SELECT *
     FROM {user_role_moderation} 
     AS urm
-    WHERE urm.uid='%d'
+    WHERE urm.uid = %d
     AND urm.uid > 1 ";
     
   $result = db_query($sql, $uid);
@@ -351,7 +351,7 @@ function user_role_moderation_insert_locked_ssesion($uid) {
   $now = time();  
   $sql = "INSERT INTO {user_role_moderation}
     (uid, locked_by, locked_datetime, status)
-    VALUES ('%d', '%d', '%d',  '%d')";
+    VALUES (%d, %d, %d, %d)";
 
   if (db_query($sql, $uid, $user->uid , $now , 1)) {
     return TRUE;
@@ -372,8 +372,8 @@ function user_role_moderation_renew_locked_session($uid) {
   $now = time();  
 
   $sql = "UPDATE {user_role_moderation}
-    SET locked_datetime='%d'
-    WHERE uid='%d' AND locked_by='%d'";
+    SET locked_datetime = %d
+    WHERE uid = %d AND locked_by = %d";
     
   if (db_query($sql, $now, $uid, $user->uid)) {
     return TRUE;
@@ -391,7 +391,7 @@ function user_role_moderation_renew_locked_session($uid) {
  */
 function user_role_moderation_remove_locked_ssesion($uid) {
   //Unlocked session locked by another moderator
-  $sql = "DELETE FROM {user_role_moderation} WHERE uid= '%d'";
+  $sql = "DELETE FROM {user_role_moderation} WHERE uid= %d";
   if (db_query($sql, $uid )) {
     return TRUE;
   }
@@ -421,7 +421,7 @@ function user_role_moderation_insert_comment($uid, $reason_id='') {
       
     $sql = "INSERT INTO {user_role_moderation_comment}
       (uid, moderator_id, datetime, comment)
-      VALUES ( '%d', '%d', '%d' , '%s' )";
+      VALUES (%d, %d, %d, '%s')";
         
     if (db_query($sql, $uid, $user->uid, $now, $comment)) {
       return TRUE;
