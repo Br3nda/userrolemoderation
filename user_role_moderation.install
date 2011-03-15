@@ -1,7 +1,7 @@
 <?php
 /**
- * This module installs two tables into the system
- * @return 
+ * @file This module installs two tables into the system
+ * 
  */
 
 function user_role_moderation_schema() {
@@ -64,10 +64,10 @@ function user_role_moderation_schema() {
       ),
       'comment' => array(
         'type' => 'text',
-    	  'size' => 'medium',
+         'size' => 'medium',
         'not null' => FALSE,
         'description' => t('Moderator\'s comment'),
-      	)
+        )
       ),
     'primary key' => array('cid'),
   );  
@@ -77,19 +77,21 @@ function user_role_moderation_schema() {
 
 function user_role_moderation_install() {
   // Create tables.
-	$success = drupal_install_schema('user_role_moderation');
-	if ($success) {
-	  drupal_set_message(st('User role moderation installed tables successfully.'));
-  }else {
-	  drupal_set_message(st('The installation of User role moderation failed.'), 'error');
+  $success = drupal_install_schema('user_role_moderation');
+  if ($success) {
+    drupal_set_message(st('User role moderation installed tables successfully.'));
+  }
+  else {
+    drupal_set_message(st('The installation of User role moderation failed.'), 'error');
   }
 }
 
 function user_role_moderation_uninstall() {
-	$success = drupal_uninstall_schema('user_role_moderation');
+  $success = drupal_uninstall_schema('user_role_moderation');
   if ($success) {
     drupal_set_message(st('User role moderation uninstalled tables successfully.'));
-  } else {
+  }
+  else {
     drupal_set_message(st('The uninstallation of user role moderation failed.'), 'error');
   }
 
