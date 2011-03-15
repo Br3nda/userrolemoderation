@@ -302,10 +302,10 @@ function user_role_moderation_is_unmoderated_user($uid) {
   }
 
   if ($out == 0) {
-      return FALSE;
+    return FALSE;
   }
   else {
-      return $out;
+    return $out;
   }
 }
 
