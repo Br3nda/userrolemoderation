@@ -82,12 +82,10 @@ function user_role_moderation_admin() {
  * @return array of roles' name
  */
 function user_role_moderation_get_user_role(){
-  $sql = "SELECT * FROM {role} WHERE rid <> 1 AND rid <> 2";
-  $result = db_query($sql);
-  $name['none']= 'No role';
+  $result = db_query("SELECT * FROM {role} WHERE rid <> 1 AND rid <> 2");
+  $name['none']= t('No role');
   while ($roles = db_fetch_object($result)) {
-    $rid = $roles->rid;
-    $name[$rid] = $roles->name;
+    $name[$roles->rid] = $roles->name;
   }
   return $name;
 }
@@ -107,7 +105,8 @@ function user_role_moderation_jquery_ui_themes(){
       $output[$val->basename] = $val->basename; 
     }
     return $output;
-  }else{
+  }
+  else{
     return FALSE;
   }
 }
