@@ -55,7 +55,7 @@ function user_role_moderation_admin() {
     '#type' => 'textarea',
     '#title' => t('Define reasons why user is banned by moderator'),
     '#size' => 120,
-    '#default_value' => variable_get('URM_reason',$reason),
+    '#default_value' => variable_get('URM_reason', $reason),
     '#description' => t('Enter reasons, please seperate each reason by
       new line. This provides moderators options to choose when banning 
       a user. (Note: Please disable WYSIWYG editor for this field before 
@@ -66,7 +66,7 @@ function user_role_moderation_admin() {
   $form['URM_theme'] = array(
     '#type' => 'select',
     '#title' => t('Select the JQuery UI theme'),
-    '#default_value' => variable_get('URM_theme','base'),
+   '#default_value' => variable_get('URM_theme', 'base'),
     '#options' =>  $theme,
     '#description' => t('Select the JQuery UI theme'),
     '#required' => TRUE,
@@ -97,7 +97,7 @@ function user_role_moderation_get_user_role(){
  * @return 
  */
 function user_role_moderation_jquery_ui_themes(){
-  $search_dir = drupal_get_path('module','jquery_ui').'/jquery.ui/themes';
+  $search_dir = drupal_get_path('module', 'jquery_ui').'/jquery.ui/themes';
   $exclude = array('.', '..', 'CVS');
   
   $dir = file_scan_directory($search_dir, '.*', $exclude , 0, FALSE);
