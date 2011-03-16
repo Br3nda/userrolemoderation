@@ -138,82 +138,82 @@ function user_role_moderation_list_users() {
  * @return
  */
 function user_role_moderation_show_comments($uid) {
-  if ($uid) {
-    $sql= "SELECT c.comment AS ucomment,
-      c.*, n.*
-      FROM {comments} c
-      LEFT JOIN {node} n
-      ON c.nid = n.nid
-      WHERE c.uid = %d
-      AND n.status = '1'
-      ORDER BY c.timestamp DESC
-      LIMIT 20";
-
-    $result = db_query($sql, $uid);
-    $list = '<ul class="comments">';
-    $num_row = 0;
-    while ($rs = db_fetch_object($result)) {
-      $comment = $rs->ucomment;
-      $cid = $rs->cid;
-      $nid = $rs->nid;
-
-      $title = $rs->title;
-      $num_row++;
-
-      $list .= '<li>';
-
-      // load the node + the comment objects
-      $c = _comment_load($cid);
-      $n = node_load($c->nid);
-
-      // title + the comment (XSS filtered)
-      $list .= '<h5 class="comment-title">'. check_plain($n->title) .'</h5>';
-      $list .= '<p>'. check_markup($comment, $c->format) .'</p>';
-
-      $list .= '<ul class="comment-button"><li>'.
-          l('Delete comment', 'comment/delete/'. $cid, array(
-              attributes => array(
-                'id' => 'cid_delete_'. intval($cid),
-                'class' => 'colorbox-form ui-state-default ui-corner-all',
-                'title' => 'Delete the comment',
-                )
-              )
-            ) .
-          '</li>'.
-          '<li>' .
-          l('Edit comment', 'comment/edit/'. $cid, array(
-              attributes => array(
-                'id' => 'cid_edit_'. $cid,
-                'class' => 'colorbox-form ui-state-default ui-corner-all',
-                'title' => 'Edit the comment',
-                )
-              )
-            ) .
-          '</li>'.
-          '<li>'.
-          l('Reply', 'comment/reply/'. $nid .'/'. $cid, array(
-              attributes => array(
-                'id' => 'cid_reply_'. $cid,
-                'class' => 'colorbox-form ui-state-default ui-corner-all',
-                'title' => 'Reply to the comment',
-                )
-              )
-            ) .
-          '</li>'.
-        '</ul>';
-
-      $list .=  '</li>';
-    }
-    $list .= '</ul>';
-
-    $out['output'] = $list;
-    $out['total'] = $num_row;
-    return $out;
+  if (!$uid) {
+    return false;
   }
-  else {
-    return FALSE;
+  
+  $sql= "SELECT c.comment AS ucomment,
+    c.*, n.*
+    FROM {comments} c
+    LEFT JOIN {node} n
+    ON c.nid = n.nid
+    WHERE c.uid = %d
+    AND n.status = '1'
+    ORDER BY c.timestamp DESC
+    LIMIT 5";
+
+  $result = db_query($sql, $uid);
+  $list = '<ul class="comments">';
+  $num_row = 0;
+  while ($rs = db_fetch_object($result)) {
+    $comment = $rs->ucomment;
+    $cid = $rs->cid;
+    $nid = $rs->nid;
+
+    $title = $rs->title;
+    $num_row++;
+
+    $list .= '<li>';
+
+    // load the node + the comment objects
+    $c = _comment_load($cid);
+    $n = node_load($c->nid);
+
+    // title + the comment (XSS filtered)
+    $list .= '<h5 class="comment-title">'. check_plain($n->title) .'</h5>';
+    $list .= '<p>'. check_markup($comment, $c->format) .'</p>';
+
+    $list .= '<ul class="comment-button"><li>'.
+        l('Delete comment', 'comment/delete/'. $cid, array(
+            attributes => array(
+              'id' => 'cid_delete_'. intval($cid),
+              'class' => 'colorbox-form ui-state-default ui-corner-all',
+              'title' => 'Delete the comment',
+              )
+            )
+          ) .
+        '</li>'.
+        '<li>' .
+        l('Edit comment', 'comment/edit/'. $cid, array(
+            attributes => array(
+              'id' => 'cid_edit_'. $cid,
+              'class' => 'colorbox-form ui-state-default ui-corner-all',
+              'title' => 'Edit the comment',
+              )
+            )
+          ) .
+        '</li>'.
+        '<li>'.
+        l('Reply', 'comment/reply/'. $nid .'/'. $cid, array(
+            attributes => array(
+              'id' => 'cid_reply_'. $cid,
+              'class' => 'colorbox-form ui-state-default ui-corner-all',
+              'title' => 'Reply to the comment',
+              )
+            )
+          ) .
+        '</li>'.
+      '</ul>';
+
+    $list .=  '</li>';
   }
-}
+  $list .= '</ul>';
+
+  $out['output'] = $list;
+  $out['total'] = $num_row;
+  return $out;
+}  
+
 
 /**
  * This function generate ban user form items (elements) for each comment
