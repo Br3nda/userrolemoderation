@@ -280,6 +280,7 @@ function user_role_moderation_is_unmoderated_user($uid) {
   }
   $sql_filter = ' AND (' . $sql_filter . ')';
 
+  $out = FALSE;
   if ($uid) {
     $sql = "SELECT *
       FROM {users} AS u
@@ -293,20 +294,10 @@ function user_role_moderation_is_unmoderated_user($uid) {
     if (count($result) == 1 ) {
       $out = db_result($result);
     }
-    else {
-      $out = 0;
-    }
-  }
-  else {
-    $out = 0;
   }
 
-  if ($out == 0) {
-    return FALSE;
-  }
-  else {
-    return $out;
-  }
+  return $out;
+
 }
 
 /**
@@ -348,17 +339,15 @@ function user_role_moderation_user_is_locked($uid) {
 
 function user_role_moderation_insert_locked_ssesion($uid) {
   global $user;
-  $now = time();  
   $sql = "INSERT INTO {user_role_moderation}
     (uid, locked_by, locked_datetime, status)
     VALUES (%d, %d, %d, %d)";
 
-  if (db_query($sql, $uid, $user->uid , $now , 1)) {
+  if (db_query($sql, $uid, $user->uid , time() , 1)) {
     return TRUE;
   }
-  else {
-    return FALSE;
-  }
+  
+  return FALSE;
 }
 
 /**
@@ -369,18 +358,14 @@ function user_role_moderation_insert_locked_ssesion($uid) {
  */
 function user_role_moderation_renew_locked_session($uid) {
   global $user;
-  $now = time();  
-
   $sql = "UPDATE {user_role_moderation}
     SET locked_datetime = %d
     WHERE uid = %d AND locked_by = %d";
     
-  if (db_query($sql, $now, $uid, $user->uid)) {
+  if (db_query($sql, time(), $uid, $user->uid)) {
     return TRUE;
   }
-  else {
-    return FALSE;
-  }
+  return FALSE;
 }
 
 /**
