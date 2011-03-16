@@ -225,15 +225,15 @@ function user_role_moderation_show_comments($uid) {
 /**
  * This function generate ban user form items (elements) for each comment
  * @param object $form_state
- * @param object $userInfo
+ * @param object $user_info
  * @return
  */
-function user_role_moderation_ban_user_form($form_state, $userInfo) {
+function user_role_moderation_ban_user_form($form_state, $user_info) {
   $reasons = chop(variable_get('URM_reason', ''));
   $reason = explode("\n", $reasons);
 
-  $form_id = 'ban_form-'. $userInfo['uid'];
-  $ban_uid = 'ban_uid_'. $userInfo['uid'];
+  $form_id = 'ban_form-'. $user_info['uid'];
+  $ban_uid = 'ban_uid_'. $user_info['uid'];
 
   $form = array(
     '#type' => 'form',
@@ -245,7 +245,7 @@ function user_role_moderation_ban_user_form($form_state, $userInfo) {
   $form[$ban_uid] = array(
     '#type' => 'fieldset',
     '#title' => t('Select the reason why do you ban '.
-      $userInfo['username'] . ' . '),
+      $user_info['username'] . ' . '),
     '#attributes' => array( 'class' => '', 'id' => ''),
     '#tree' => TRUE,
   );
@@ -257,20 +257,20 @@ function user_role_moderation_ban_user_form($form_state, $userInfo) {
     '#options' =>  $reason ,
     '#name' => 'reason[]',
     '#description' => t('Select one of the reason why do you ban '.
-      $userInfo['username'] .' . '),
+      $user_info['username'] .' . '),
   );
   $form[$ban_uid]['submit'] = array(
     '#type' => 'button',
     '#attributes' => array('class' => 'ui-state-default ui-corner-all'),
     '#name' => 'step',
-    '#id' => 'confirm_ban-' . $userInfo['uid'],
-    '#value' => t('Ban ' . $userInfo['username']),
+    '#id' => 'confirm_ban-' . $user_info['uid'],
+    '#value' => t('Ban ' . $user_info['username']),
   );
   $form[$ban_uid]['cancel'] = array(
     '#type' => 'button',
     '#attributes' => array( 'class' => 'ui-state-default ui-corner-all'),
     '#name' => 'step',
-    '#id' => 'cancer_ban-' . $userInfo['uid'],
+    '#id' => 'cancer_ban-' . $user_info['uid'],
     '#value' => t('Cancel'),
   );
 
