@@ -301,7 +301,7 @@ function user_role_moderation_ago($timestamp) {
   }
   $difference = round($difference);
   if ($difference != 1) {
-    $periods[$j].= 's';
+    $periods[$j] .= 's';
   }
   $text = $difference . ' ' . $periods[$j] . ' ago';
   return $text;
