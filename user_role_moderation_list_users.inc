@@ -58,15 +58,14 @@ function user_role_moderation_list_users() {
     LEFT JOIN {comments} AS c
     On u.uid = c.uid
     WHERE " . $sql_filter . "
-    AND u.uid != '0'
-    AND u.status = '1'
-    GROUP BY u.uid
-    HAVING tt > 0
-    ORDER BY u.created ASC
-    LIMIT 0," . variable_get('URM_list_max', 20);
+    AND u.uid <> 0
+    AND u.status = 1
+    GROUP BY u.uid , u.name, u.created, r.rid, r.name
+    HAVING count(c.cid) > 0";
+ 
 
-  $result = db_query($sql);
-
+//   $result = db_query($sql);
+  $result = pager_query($sql, variable_get('URM_list_max', 20));
   while ($users = db_fetch_object($result)) {
     // get user details (XSS filtered)
     $uid = $users->uid;
@@ -81,14 +80,14 @@ function user_role_moderation_list_users() {
     $user_comments = user_role_moderation_show_comments($uid);
     $list .=
       '<h3 id="user_uid-' . $uid . '">' .
-        '<span class="username">' . $uname . '</span>' .
+        '<span class="username">' . $uname . '.</span>' .
         '<span class="error-reason"></span>' .
-        '<span class="ajax-spinner"></span>' .
+        '<span class="ajax-spinner"></span> ' .
         '<span class="date">' .
-          'Registered ' . user_role_moderation_ago($ucreated) .
-        '</span>' .
+          t('Registered %timeago.', array('%timeago' =>  user_role_moderation_ago($ucreated))) .
+        '</span>  ' .
         '<span class="total-comment">' .
-          $user_comments['total'] . ' comments' .
+        t('@count comments.', array('@count' => $user_comments['total'])) .
         '</span>' .
       '</h3>';
 
@@ -134,7 +133,7 @@ function user_role_moderation_list_users() {
     $list = '<div id="accordion">'. $list .'</div>';
   }
   else {
-    $list = 'There are no users pending for moderation.';
+    $list = t('There are no users pending for moderation.');
   }
   return $list;
 }
@@ -154,15 +153,15 @@ function user_role_moderation_show_comments($uid) {
       WHERE c.uid = $uid
       AND n.status = '1'
       ORDER BY c.timestamp DESC
-      LIMIT 0, 20";
+      LIMIT 20";
 
     $result = db_query($sql);
     $list = '<ul class="comments">';
-    $num_row =0;
+    $num_row = 0;
     while ($rs = db_fetch_object($result)) {
       $comment = $rs->ucomment;
-      $cid=$rs->cid;
-      $nid=$rs->nid;
+      $cid = $rs->cid;
+      $nid = $rs->nid;
 
       $title = $rs->title;
       $num_row++;
