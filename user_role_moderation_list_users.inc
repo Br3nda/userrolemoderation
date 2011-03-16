@@ -107,13 +107,13 @@ function user_role_moderation_list_users() {
             )
           ) .
         l('<span class="ui-icon ui-icon-circle-check"></span>' .
-          '<span class="text">'. t('Approve @name.', array('@name' => $uname )). '</span>',
+          '<span class="text">'. t('Approve @name.', array('@name' => $uname )) .'</span>',
           'action/approve/' . $uid,
           array(
             attributes => array(
               'id' => 'approve_user-' . $uid,
               'class' => 'approve colorbox-form ui-state-default ui-corner-all',
-              'title' => t('Approve the user @name.', array('@name' => uname,))
+              'title' => t('Approve the user @name.', array('@name' => uname))
               ),
             html => TRUE,
             )
@@ -139,7 +139,7 @@ function user_role_moderation_list_users() {
  */
 function user_role_moderation_show_comments($uid) {
   if (!$uid) {
-    return false;
+    return FALSE;
   }
   
   $sql= "SELECT c.comment AS ucomment,
