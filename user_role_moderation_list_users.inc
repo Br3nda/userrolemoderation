@@ -94,7 +94,7 @@ function user_role_moderation_list_users() {
     $list .=
       '<p>' .
         l('<span class="ui-icon ui-icon-circle-close"></span>' .
-          '<span class="text">Ban ' . $uname . '</span>' .
+          '<span class="text">' . t('Ban @name', array('@name' => $uname)) . '</span>' .
           '<span class="ui-icon ui-icon-right ui-icon-triangle-1-s"></span>',
           'colorbox/form/user_role_moderation_ban_user_form',
           array(
