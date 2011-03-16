@@ -36,10 +36,10 @@ function user_role_moderation_admin() {
   $roles = user_role_moderation_get_user_role();
   $form['URM_default_role'] = array(
     '#type' => 'checkboxes',
-    '#title' => t('Select the following roles to appear on moderation list'),
+    '#title' => t('Moderated Roles'),
     '#default_value' => variable_get('URM_default_role', 'none'),
     '#options' => $roles,
-    '#description' => t('These roles are to be appeared on moderation list'),
+    '#description' => t('Select the roles to appear on moderation list'),
     '#required' => TRUE,
   );
   $roles = user_role_moderation_get_user_role();
