@@ -188,7 +188,7 @@ function user_role_moderation_show_comments($uid) {
             attributes => array(
               'id' => 'cid_edit_'. $cid,
               'class' => 'colorbox-form ui-state-default ui-corner-all',
-              'title' => 'Edit the comment',
+              'title' => t('Edit the comment'),
               )
             )
           ) .
@@ -198,7 +198,7 @@ function user_role_moderation_show_comments($uid) {
             attributes => array(
               'id' => 'cid_reply_'. $cid,
               'class' => 'colorbox-form ui-state-default ui-corner-all',
-              'title' => 'Reply to the comment',
+              'title' => t('Reply to the comment'),
               )
             )
           ) .
@@ -237,8 +237,7 @@ function user_role_moderation_ban_user_form($form_state, $user_info) {
   );
   $form[$ban_uid] = array(
     '#type' => 'fieldset',
-    '#title' => t('Select the reason why do you ban '.
-      $user_info['username'] . ' . '),
+    '#title' => t('Reason for banning @name.', array('@name' => $user_info['username'])),
     '#attributes' => array( 'class' => '', 'id' => ''),
     '#tree' => TRUE,
   );
@@ -249,8 +248,7 @@ function user_role_moderation_ban_user_form($form_state, $user_info) {
     '#attributes' => array( 'class' => 'ban_reasons', 'id' => ''),
     '#options' =>  $reason ,
     '#name' => 'reason[]',
-    '#description' => t('Select one of the reason why do you ban '.
-      $user_info['username'] .' . '),
+    '#description' => t('Select reason for banning @name.', array('@name' => $user_info['username'])),
   );
   $form[$ban_uid]['submit'] = array(
     '#type' => 'button',
