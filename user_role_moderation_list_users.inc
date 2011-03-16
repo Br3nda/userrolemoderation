@@ -127,12 +127,9 @@ function user_role_moderation_list_users() {
   }
 
   if ($list) {
-    $list = '<div id="accordion">'. $list .'</div>';
+    return '<div id="accordion">'. $list .'</div>';
   }
-  else {
-    $list = t('There are no users pending for moderation.');
-  }
-  return $list;
+  return t('There are no users pending for moderation.');
 }
 
 /**
