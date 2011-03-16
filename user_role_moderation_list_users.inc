@@ -11,14 +11,11 @@ function user_role_moderation_list_users() {
     'effects.core',
     'ui.accordion'
   ));
-  drupal_add_css(drupal_get_path('module', 'jquery_ui') .
-    '/jquery.ui/themes/' . variable_get('URM_theme', 'base') . '/ui.all.css');
+  drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/' . variable_get('URM_theme', 'base') .'/ui.all.css');
 
   //Include js only to this function
-  drupal_add_css(drupal_get_path('module', 'user_role_moderation') .
-    '/user_role_moderation.css');
-  drupal_add_js(drupal_get_path('module', 'user_role_moderation') .
-    '/user_role_moderation.js');
+  drupal_add_css(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.css');
+  drupal_add_js(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.js');
 
   $default_role = variable_get('URM_default_role', 0);
 
@@ -104,19 +101,19 @@ function user_role_moderation_list_users() {
             attributes => array(
               'id' => 'ban_user-'. $uid,
               'class' => 'ban colorbox-form ui-state-default ui-corner-all',
-              'title' => 'Ban the user '. $uname,
+              'title' => t('Ban the user @name.', array('@name' => $uname)),
               ),
             html => TRUE,
             )
           ) .
         l('<span class="ui-icon ui-icon-circle-check"></span>' .
-          '<span class="text">Approve ' . $uname . '</span>',
+          '<span class="text">'. t('Approve @name.', array('@name' => $uname )). '</span>',
           'action/approve/' . $uid,
           array(
             attributes => array(
               'id' => 'approve_user-' . $uid,
               'class' => 'approve colorbox-form ui-state-default ui-corner-all',
-              'title' => 'Approve the user '. $uname,
+              'title' => t('Approve the user @name.', array('@name' => uname,))
               ),
             html => TRUE,
             )
@@ -150,12 +147,12 @@ function user_role_moderation_show_comments($uid) {
       FROM {comments} c
       LEFT JOIN {node} n
       ON c.nid = n.nid
-      WHERE c.uid = $uid
+      WHERE c.uid = %d
       AND n.status = '1'
       ORDER BY c.timestamp DESC
       LIMIT 20";
 
-    $result = db_query($sql);
+    $result = db_query($sql, $uid);
     $list = '<ul class="comments">';
     $num_row = 0;
     while ($rs = db_fetch_object($result)) {
