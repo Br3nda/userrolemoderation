@@ -12,11 +12,11 @@ function user_role_moderation_list_users() {
     'ui.accordion'
   ));
   drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/' . variable_get('URM_theme', 'base') .'/ui.all.css');
-
+  
   //Include js only to this function
   drupal_add_css(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.css');
   drupal_add_js(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.js');
-
+  
   $default_role = variable_get('URM_default_role', 0);
 
   foreach ($default_role as $key => $val) {
@@ -93,21 +93,8 @@ function user_role_moderation_list_users() {
 
     $list .=
       '<p>' .
-        l('<span class="ui-icon ui-icon-circle-close"></span>' .
-          '<span class="text">' . t('Ban @name', array('@name' => $uname)) . '</span>' .
-          '<span class="ui-icon ui-icon-right ui-icon-triangle-1-s"></span>',
-          'colorbox/form/user_role_moderation_ban_user_form',
-          array(
-            attributes => array(
-              'id' => 'ban_user-'. $uid,
-              'class' => 'ban colorbox-form ui-state-default ui-corner-all',
-              'title' => t('Ban the user @name.', array('@name' => $uname)),
-              ),
-            html => TRUE,
-            )
-          ) .
-        l('<span class="ui-icon ui-icon-circle-check"></span>' .
-          '<span class="text">'. t('Approve @name.', array('@name' => $uname )) .'</span>',
+        drupal_get_form('user_role_moderation_ban_user_form', $data) .
+        l(t('Approve @name.', array('@name' => $uname )),
           'action/approve/' . $uid,
           array(
             attributes => array(
@@ -119,10 +106,7 @@ function user_role_moderation_list_users() {
             )
           ) .
       '</p>';
-    $list .=
-      '<div style="display: none;">'.
-        drupal_get_form('user_role_moderation_ban_user_form', $data) .
-      '</div>';
+
     $list .= '<div class="clear"></div></div>';
   }
 
@@ -178,7 +162,7 @@ function user_role_moderation_show_comments($uid) {
             attributes => array(
               'id' => 'cid_delete_'. intval($cid),
               'class' => 'colorbox-form ui-state-default ui-corner-all',
-              'title' => 'Delete the comment',
+              'title' => t('Delete the comment'),
               )
             )
           ) .
@@ -235,13 +219,13 @@ function user_role_moderation_ban_user_form($form_state, $user_info) {
     '#id' => t($form_id),
     '#tree' => TRUE,
   );
-  $form[$ban_uid] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Reason for banning @name.', array('@name' => $user_info['username'])),
-    '#attributes' => array( 'class' => '', 'id' => ''),
-    '#tree' => TRUE,
+  $form['ban_'. $ban_uid] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Ban @name', array('@name' => $user_info['username'])),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
   );
-  $form[$ban_uid]['reason'] = array(
+  $form['ban_'. $ban_uid]['reason'] = array(
     '#type' => 'radios',
     '#title' => t('Reasons'),
     '#default_value' => '',
@@ -250,14 +234,14 @@ function user_role_moderation_ban_user_form($form_state, $user_info) {
     '#name' => 'reason[]',
     '#description' => t('Select reason for banning @name.', array('@name' => $user_info['username'])),
   );
-  $form[$ban_uid]['submit'] = array(
+  $form['ban_'. $ban_uid]['submit'] = array(
     '#type' => 'button',
     '#attributes' => array('class' => 'ui-state-default ui-corner-all'),
     '#name' => 'step',
     '#id' => 'confirm_ban-' . $user_info['uid'],
     '#value' => t('Ban ' . $user_info['username']),
   );
-  $form[$ban_uid]['cancel'] = array(
+  $form['ban_'. $ban_uid]['cancel'] = array(
     '#type' => 'button',
     '#attributes' => array( 'class' => 'ui-state-default ui-corner-all'),
     '#name' => 'step',
