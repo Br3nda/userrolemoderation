@@ -14,8 +14,8 @@ function user_role_moderation_list_users() {
   drupal_add_css(drupal_get_path('module', 'jquery_ui') .'/jquery.ui/themes/' . variable_get('URM_theme', 'base') .'/ui.all.css');
   
   //Include js only to this function
-  drupal_add_css(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.css');
-  drupal_add_js(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.js');
+//   drupal_add_css(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.css');
+//   drupal_add_js(drupal_get_path('module', 'user_role_moderation') .'/user_role_moderation.js');
   
   $default_role = variable_get('URM_default_role', 0);
 
@@ -64,6 +64,7 @@ function user_role_moderation_list_users() {
 //   $result = db_query($sql);
   $result = pager_query($sql, variable_get('URM_list_max', 20));
   while ($users = db_fetch_object($result)) {
+    
     // get user details (XSS filtered)
     $uid = $users->uid;
     $uname = check_plain($users->uname);
@@ -81,7 +82,7 @@ function user_role_moderation_list_users() {
         '<span class="error-reason"></span>' .
         '<span class="ajax-spinner"></span> ' .
         '<span class="date">' .
-          t('Registered %timeago.', array('%timeago' =>  user_role_moderation_ago($ucreated))) .
+          t('Registered %timeago ago.', array('%timeago' =>  format_interval($ucreated))) .
         '</span>  ' .
         '<span class="total-comment">' .
         t('@count comments.', array('@count' => $user_comments['total'])) .
@@ -90,24 +91,12 @@ function user_role_moderation_list_users() {
 
     $list .= '<div>';
     $list .= $user_comments['output'];
-
-    $list .=
-      '<p>' .
-        drupal_get_form('user_role_moderation_ban_user_form', $data) .
-        l(t('Approve @name.', array('@name' => $uname )),
-          'action/approve/' . $uid,
-          array(
-            attributes => array(
-              'id' => 'approve_user-' . $uid,
-              'class' => 'approve colorbox-form ui-state-default ui-corner-all',
-              'title' => t('Approve the user @name.', array('@name' => uname))
-              ),
-            html => TRUE,
-            )
-          ) .
-      '</p>';
-
-    $list .= '<div class="clear"></div></div>';
+    
+    $items = array();
+    $items[] = drupal_get_form('user_role_moderation_ban_user_form', $data);
+    $items[] = l(t('Approve @name.', array('@name' => $uname )),'action/approve/' . $uid);
+    $list .= theme('item_list', $items);
+    
   }
 
   if ($list) {
@@ -126,25 +115,22 @@ function user_role_moderation_show_comments($uid) {
     return FALSE;
   }
   
-  $sql= "SELECT c.comment AS ucomment,
-    c.*, n.*
+  $sql= "SELECT c.comment AS ucomment, c.*, n.*
     FROM {comments} c
-    LEFT JOIN {node} n
+      LEFT JOIN {node} n
     ON c.nid = n.nid
-    WHERE c.uid = %d
-    AND n.status = '1'
+    WHERE c.uid = %d AND n.status = '1'
     ORDER BY c.timestamp DESC
     LIMIT 5";
 
   $result = db_query($sql, $uid);
-  $list = '<ul class="comments">';
+  
   $num_row = 0;
   while ($rs = db_fetch_object($result)) {
     $comment = $rs->ucomment;
     $cid = $rs->cid;
     $nid = $rs->nid;
 
-    $title = $rs->title;
     $num_row++;
 
     $list .= '<li>';
@@ -156,42 +142,12 @@ function user_role_moderation_show_comments($uid) {
     // title + the comment (XSS filtered)
     $list .= '<h5 class="comment-title">'. check_plain($n->title) .'</h5>';
     $list .= '<p>'. check_markup($comment, $c->format) .'</p>';
-
-    $list .= '<ul class="comment-button"><li>'.
-        l('Delete comment', 'comment/delete/'. $cid, array(
-            attributes => array(
-              'id' => 'cid_delete_'. intval($cid),
-              'class' => 'colorbox-form ui-state-default ui-corner-all',
-              'title' => t('Delete the comment'),
-              )
-            )
-          ) .
-        '</li>'.
-        '<li>' .
-        l('Edit comment', 'comment/edit/'. $cid, array(
-            attributes => array(
-              'id' => 'cid_edit_'. $cid,
-              'class' => 'colorbox-form ui-state-default ui-corner-all',
-              'title' => t('Edit the comment'),
-              )
-            )
-          ) .
-        '</li>'.
-        '<li>'.
-        l('Reply', 'comment/reply/'. $nid .'/'. $cid, array(
-            attributes => array(
-              'id' => 'cid_reply_'. $cid,
-              'class' => 'colorbox-form ui-state-default ui-corner-all',
-              'title' => t('Reply to the comment'),
-              )
-            )
-          ) .
-        '</li>'.
-      '</ul>';
-
-    $list .=  '</li>';
+    $items = array();
+    $items[] = l('Delete comment', 'comment/delete/'. $cid);
+    $items[] = l('Edit comment', 'comment/edit/'. $cid);
+    $items[] = l('Reply', 'comment/reply/'. $nid .'/'. $cid);
   }
-  $list .= '</ul>';
+  $list .= theme('item_list', $items, null, 'ul', array('class' => 'comments')); //$list = '<ul class="comments">';
 
   $out['output'] = $list;
   $out['total'] = $num_row;
@@ -208,16 +164,9 @@ function user_role_moderation_show_comments($uid) {
 function user_role_moderation_ban_user_form($form_state, $user_info) {
   $reasons = chop(variable_get('URM_reason', ''));
   $reason = explode("\n", $reasons);
-
-  $form_id = 'ban_form-'. $user_info['uid'];
-  $ban_uid = 'ban_uid_'. $user_info['uid'];
-
+  $ban_uid = $user_info['uid'];
+  
   $form = array(
-    '#type' => 'form',
-    '#method' => 'post',
-    '#attributes' => array( 'class' => 'ban_forms'),
-    '#id' => t($form_id),
-    '#tree' => TRUE,
   );
   $form['ban_'. $ban_uid] = array(
       '#type' => 'fieldset',
@@ -227,57 +176,29 @@ function user_role_moderation_ban_user_form($form_state, $user_info) {
   );
   $form['ban_'. $ban_uid]['reason'] = array(
     '#type' => 'radios',
-    '#title' => t('Reasons'),
+    '#title' => t('Reason'),
     '#default_value' => '',
-    '#attributes' => array( 'class' => 'ban_reasons', 'id' => ''),
     '#options' =>  $reason ,
-    '#name' => 'reason[]',
+    '#name' => 'reason',
+    '#required' => TRUE,
     '#description' => t('Select reason for banning %name.', array('%name' => $user_info['username'])),
   );
   $form['ban_'. $ban_uid]['submit'] = array(
     '#type' => 'button',
-    '#attributes' => array('class' => 'ui-state-default ui-corner-all'),
     '#name' => 'step',
     '#id' => 'confirm_ban-' . $user_info['uid'],
     '#value' => t('Ban ' . $user_info['username']),
   );
   $form['ban_'. $ban_uid]['cancel'] = array(
     '#type' => 'button',
-    '#attributes' => array( 'class' => 'ui-state-default ui-corner-all'),
     '#name' => 'step',
     '#id' => 'cancer_ban-' . $user_info['uid'],
     '#value' => t('Cancel'),
   );
-
+//   drupal_set_message(print_r($form, 1));
   return $form;
 }
 
-/**
- * Convert timestamp to human readable date format
- *
- * @param object $timestamp
- * @return pretty formatted time ago string
- */
-function user_role_moderation_ago($timestamp) {
-  $difference = time() - $timestamp;
-  $periods = array(
-    'second',
-    'minute',
-    'hour',
-    'day',
-    'week',
-    'month',
-    'year',
-    'decade',
-  );
-  $lengths = array('60', '60', '24', '7', '4.35', '12', '10');
-  for ($j = 0; $difference >= $lengths[$j]; $j++) {
-    $difference /= $lengths[$j];
-  }
-  $difference = round($difference);
-  if ($difference != 1) {
-    $periods[$j] .= 's';
-  }
-  $text = $difference . ' ' . $periods[$j] . ' ago';
-  return $text;
+function user_role_moderation_ban_user_form_submit() {
+  drupal_set_message(__FUNCTION__);
 }
