@@ -232,7 +232,7 @@ function user_role_moderation_ban_user_form($form_state, $user_info) {
     '#attributes' => array( 'class' => 'ban_reasons', 'id' => ''),
     '#options' =>  $reason ,
     '#name' => 'reason[]',
-    '#description' => t('Select reason for banning @name.', array('@name' => $user_info['username'])),
+    '#description' => t('Select reason for banning %name.', array('%name' => $user_info['username'])),
   );
   $form['ban_'. $ban_uid]['submit'] = array(
     '#type' => 'button',
